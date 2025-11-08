@@ -11,7 +11,6 @@ import {
   LabelList,
 } from "recharts";
 
-// --- NO CHANGES TO ANY LOGIC ---
 export default function CompareTab() {
   const [data, setData] = useState<any[]>([]);
   const [baseline, setBaseline] = useState<any>(null);
@@ -30,7 +29,7 @@ export default function CompareTab() {
         return;
       }
       setBaseline(json.baseline);
-      setData(json.comparison);
+      setData(json.comparison || []); // ✅ handle missing comparison
       setLoading(false);
     } catch (e: any) {
       setError("Failed to fetch comparison data");
@@ -41,171 +40,195 @@ export default function CompareTab() {
   useEffect(() => {
     fetchComparison();
   }, []);
-  // --- END OF UNCHANGED LOGIC ---
 
-  // --- START OF NEW STYLED JSX ---
-
-  // --- Styled Loading State ---
   if (loading) {
     return (
-      <div className="p-8 text-center">
-        <p className="text-lg font-medium text-indigo-600">
+      <div className="flex min-h-[500px] w-full flex-col items-center justify-center p-8 bg-slate-50">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent"></div>
+        <p className="mt-4 text-lg font-medium text-slate-700">
           Loading comparison data...
         </p>
       </div>
     );
   }
 
-  // --- Styled Error State ---
   if (error) {
     return (
-      <div className="p-8">
-        <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-lg shadow-md font-medium">
-          {error}
+      <div className="flex min-h-[500px] w-full items-center justify-center p-8 bg-slate-50">
+        <div className="w-full max-w-lg rounded-lg bg-red-50 p-6 shadow-lg">
+          <h3 className="text-lg font-semibold text-red-900 mb-1">
+            An Error Occurred
+          </h3>
+          <p className="text-sm text-red-700">{error}</p>
         </div>
       </div>
     );
   }
 
-  // --- Styled Empty State ---
   if (!data.length) {
     return (
-      <div className="p-8 text-center">
-        <h3 className="text-lg font-medium text-slate-600">No Data</h3>
-        <p className="mt-1 text-sm text-slate-500">
-          No comparison data available.
+      <div className="flex min-h-[500px] w-full flex-col items-center justify-center p-8 text-center bg-slate-50">
+        <h3 className="mt-4 text-xl font-semibold text-slate-700">No Data</h3>
+        <p className="mt-2 text-sm text-slate-500">
+          No comparison data available to display.
         </p>
       </div>
     );
   }
 
-  // --- Main Styled Component ---
   return (
-    <div className="max-w-7xl mx-auto p-6 md:p-8 bg-white rounded-xl shadow-2xl">
-      <h2 className="text-2xl font-semibold text-slate-800 mb-6 border-b pb-4">
-        📊 GHG Intensity Comparison
-      </h2>
+    // --- BACKGROUND ADDED HERE ---
+    <div className="bg-slate-50 min-h-screen p-6 md:p-8">
+      <div className="mx-auto max-w-7xl space-y-8">
+        <h2 className="text-3xl font-bold tracking-tight text-slate-900">
+          GHG Intensity Comparison
+        </h2>
 
-      {/* --- Baseline Stat Card --- */}
-      <div className="p-6 bg-slate-50 rounded-lg shadow-sm mb-8">
-        <div className="text-sm font-medium text-slate-500 uppercase tracking-wider">
-          Baseline Route
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          {/* --- Baseline Card --- */}
+          <div className="lg:col-span-1">
+            <div className="rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-800 p-6 text-white shadow-lg">
+              <div className="text-sm font-medium uppercase tracking-wider text-indigo-200">
+                Selected Baseline
+              </div>
+              <div className="mt-4">
+                <span className="text-4xl font-extrabold">
+                  {baseline?.routeId || "N/A"}
+                </span>
+                <div className="mt-1 text-2xl font-medium text-indigo-100 opacity-90">
+                  {baseline?.ghgIntensity
+                    ? `${baseline.ghgIntensity} gCO₂e/MJ`
+                    : "No baseline"}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* --- Chart --- */}
+          <div className="rounded-xl bg-white p-6 shadow-lg lg:col-span-2">
+            <h3 className="text-xl font-semibold text-slate-900 mb-4">
+              Intensity Breakdown
+            </h3>
+            <ResponsiveContainer width="100%" height={400}>
+              <BarChart
+                data={data}
+                margin={{ top: 20, right: 30, bottom: 60, left: 20 }}
+              >
+                <XAxis
+                  dataKey="routeId"
+                  angle={-30}
+                  textAnchor="end"
+                  interval={0}
+                  height={70}
+                  tick={{ fontSize: 12 }}
+                />
+                <YAxis
+                  label={{
+                    value: "GHG Intensity (gCO₂e/MJ)",
+                    angle: -90,
+                    position: "insideLeft",
+                    dy: 80,
+                    fontSize: 14,
+                    fill: "#334155",
+                  }}
+                  tick={{ fontSize: 12 }}
+                />
+                <Tooltip />
+                <Legend verticalAlign="top" iconType="circle" />
+                <Bar
+                  dataKey="ghgIntensity"
+                  name="GHG Intensity"
+                  fill="#4f46e5"
+                  radius={[6, 6, 0, 0]}
+                >
+                  <LabelList
+                    dataKey="ghgIntensity"
+                    position="top"
+                    fontSize="10"
+                  />
+                </Bar>
+                <Bar
+                  dataKey="baselineIntensity"
+                  name="Baseline"
+                  fill="#22c55e"
+                  radius={[6, 6, 0, 0]}
+                >
+                  <LabelList
+                    dataKey="baselineIntensity"
+                    position="top"
+                    fontSize="10"
+                  />
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
-        <div className="mt-1">
-          <span className="text-3xl font-bold text-slate-900">
-            {baseline.routeId}
-          </span>
-          <span className="ml-2 text-xl font-medium text-slate-600">
-            ({baseline.ghgIntensity} gCO₂e/MJ)
-          </span>
-        </div>
-      </div>
 
-      {/* --- Chart Section --- */}
-      <div className="p-6 border border-slate-200 rounded-lg shadow-md mb-8">
-        <h3 className="text-lg font-semibold text-slate-800 mb-4">
-          Intensity Chart
-        </h3>
-        <ResponsiveContainer width="100%" height={400}>
-          <BarChart
-            data={data}
-            margin={{ top: 20, right: 40, bottom: 60, left: 20 }}
-          >
-            <XAxis dataKey="routeId" angle={-20} textAnchor="end" interval={0} />
-            <YAxis
-              label={{
-                value: "GHG Intensity (gCO₂e/MJ)",
-                angle: -90,
-                position: "insideLeft",
-                dy: 40, // Adjust position
-              }}
-            />
-            <Tooltip />
-            <Legend verticalAlign="top" />
-
-            <Bar
-              dataKey="ghgIntensity"
-              name="GHG Intensity"
-              fill="#4f46e5" // Theme: Indigo 600
-              radius={[6, 6, 0, 0]}
-            >
-              <LabelList dataKey="ghgIntensity" position="top" fontSize="10" />
-            </Bar>
-
-            <Bar
-              dataKey="baselineIntensity"
-              name="Baseline"
-              fill="#22c55e" // Theme: Green 500
-              radius={[6, 6, 0, 0]}
-            >
-              <LabelList
-                dataKey="baselineIntensity"
-                position="top"
-                fontSize="10"
-              />
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* --- Table Section --- */}
-      <div>
-        <h3 className="text-lg font-semibold text-slate-800 mb-4">
-          Compliance Summary
-        </h3>
-        <div className="overflow-x-auto bg-white rounded-lg shadow-md border border-slate-200">
-          <table className="min-w-full text-sm">
-            <thead className="bg-slate-100">
-              <tr>
-                <th className="p-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
-                  Route
-                </th>
-                <th className="p-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
-                  Fuel Type
-                </th>
-                <th className="p-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
-                  GHG Intensity
-                </th>
-                <th className="p-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
-                  Difference (%)
-                </th>
-                <th className="p-4 text-center text-xs font-semibold uppercase tracking-wider text-slate-600">
-                  Compliant
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200">
-              {data.map((r, i) => (
-                <tr key={i} className="hover:bg-slate-50">
-                  <td className="p-4 font-medium text-slate-800">
-                    {r.routeId}
-                  </td>
-                  <td className="p-4 text-slate-700">{r.fuelType}</td>
-                  <td className="p-4 text-slate-700">
-                    {r.ghgIntensity.toFixed(2)}
-                  </td>
-                  <td
-                    className={`p-4 font-medium ${
-                      r.percentDiff <= 0 ? "text-green-600" : "text-red-600"
-                    }`}
-                  >
-                    {r.percentDiff.toFixed(2)}%
-                  </td>
-                  <td className="p-4 text-center">
-                    {r.compliant ? (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        ✅ Yes
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                        ❌ No
-                      </span>
-                    )}
-                  </td>
+        {/* --- Table --- */}
+        <div className="overflow-hidden rounded-xl bg-white shadow-lg">
+          <h3 className="border-b border-slate-200 p-6 text-xl font-semibold text-slate-900">
+            Compliance Summary
+          </h3>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="bg-slate-50">
+                <tr>
+                  <th className="p-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+                    Route
+                  </th>
+                  <th className="p-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+                    Fuel Type
+                  </th>
+                  <th className="p-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+                    GHG Intensity
+                  </th>
+                  <th className="p-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+                    Difference vs. Baseline (%)
+                  </th>
+                  <th className="p-4 text-center text-xs font-semibold uppercase tracking-wider text-slate-600">
+                    Compliance
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-slate-200">
+                {data.map((r, i) => (
+                  <tr key={i} className="hover:bg-indigo-50">
+                    <td className="p-4 font-medium text-slate-800">
+                      {r.routeId || "N/A"}
+                    </td>
+                    <td className="p-4 text-slate-700">{r.fuelType || "N/A"}</td>
+                    <td className="p-4 text-slate-700">
+                      {r.ghgIntensity !== undefined
+                        ? r.ghgIntensity.toFixed(2)
+                        : "N/A"}
+                    </td>
+                    <td
+                      className={`p-4 font-medium ${
+                        r.percentDiff <= 0 ? "text-green-600" : "text-red-600"
+                      }`}
+                    >
+                      {r.percentDiff !== undefined
+                        ? `${
+                            r.percentDiff > 0 ? "+" : ""
+                          }${r.percentDiff.toFixed(2)}%`
+                        : "N/A"}
+                    </td>
+                    <td className="p-4 text-center">
+                      {r.compliant ? (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-800">
+                          ✅ Compliant
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-800">
+                          ❌ Non-Compliant
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
