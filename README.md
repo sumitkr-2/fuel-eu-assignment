@@ -88,7 +88,15 @@ App: **[http://localhost:5173](http://localhost:5173)**
   <img src="https://github.com/user-attachments/assets/5e729073-4625-4bd7-a98e-49fa861220f3" width="90%" />
 </p>
 
----
+<p align="center">
+  <img width="1468" height="881" alt="image" src="https://github.com/user-attachments/assets/08122ade-c56e-422e-9fdb-6a325e91cdbc" />
+</p>
+
+
+<p align="center">
+  <img width="1464" height="835" alt="image" src="https://github.com/user-attachments/assets/d231c0c6-9337-401f-8e3f-1aa0ce5e232d" />
+</p>
+
 
 ### 3️⃣ Environment Variables
 
