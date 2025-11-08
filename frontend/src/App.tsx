@@ -1,8 +1,10 @@
 import { useState } from "react";
 import RoutesTab from "./components/RoutesTab";
 import CompareTab from "./components/CompareTab";
-import BankingTab from "./components/BankingTab";
+
 import PoolingTab from "./components/PoolingTab";
+import BankingTab from "./components/BankingTab";
+import { BankingPanel } from "./components/BankingPanel";
 
 export default function App() {
   const [tab, setTab] = useState("routes");
@@ -13,6 +15,8 @@ export default function App() {
         return <CompareTab />;
       case "banking":
         return <BankingTab />;
+        case "bankingPanel":
+           <BankingPanel/>;
       case "pooling":
         return <PoolingTab />;
       default:
