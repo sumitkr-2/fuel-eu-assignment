@@ -1,62 +1,70 @@
-AI Agent Workflow Log
-Overview
+<p align="center">
+  <img src="https://img.shields.io/badge/AI%20Agent%20Workflow%20Log-2025-purple?style=for-the-badge&logo=openai&logoColor=white" />
+</p>
 
-This log documents my complete usage of AI coding assistants — Gemini (Google), ChatGPT (GPT-5), Cursor Agent, and GitHub Copilot — during development of the FuelEU Maritime Compliance Platform (full-stack assignment).
+<h1 align="center">🤖 AI Agent Workflow Log</h1>
 
-Each agent was used at different stages of the project:
+<p align="center">
+A detailed log of how multiple AI coding assistants — <b>Gemini (Google)</b>, <b>ChatGPT (GPT-5)</b>, <b>Cursor Agent</b>, and <b>GitHub Copilot</b> — were used to design and build the <b>FuelEU Maritime Compliance Platform</b>.
+</p>
 
-Gemini — Initial environment setup, PostgreSQL config, and project bootstrapping.
+---
 
-ChatGPT (GPT-5) — Core backend logic, Prisma debugging, frontend integration, and bug analysis.
+## 🧭 Overview
 
-Cursor Agent — Refactoring and path-alias fixes for TypeScript imports.
+Each AI agent played a different role during project development:
 
-GitHub Copilot — Inline completions and minor syntax fixes (especially JSX + Tailwind).
+- 🧠 **Gemini** — Environment setup, PostgreSQL configuration, and initial bootstrapping.  
+- ⚙️ **ChatGPT (GPT-5)** — Core backend logic, Prisma debugging, frontend integration, and bug analysis.  
+- 🧩 **Cursor Agent** — Refactoring and TypeScript path alias corrections.  
+- 🎨 **GitHub Copilot** — Inline completions and rapid JSX/Tailwind generation.
 
-🧩 Agents Used
-Agent	Primary Use
-Gemini	Initial scaffolding, Prisma schema, DB setup
-ChatGPT (GPT-5)	Core backend API design, compliance formulas, debugging
-Cursor Agent	TypeScript refactoring, alias debugging
-Copilot	Tailwind and boilerplate JSX generation
-🧱 Example 1 — Project Setup and Database Schema (Gemini)
+---
 
-Prompt:
+## 🧩 Agents Used
 
-“I’m working on a full-stack assignment using Node.js, TypeScript, and PostgreSQL with Hexagonal Architecture. Please guide me through initializing dependencies, configuring TypeScript, and defining Prisma schema based on the provided table.”
+| 🧠 Agent | 🔧 Primary Use |
+|----------|----------------|
+| **Gemini** | Initial scaffolding, Prisma schema, DB setup |
+| **ChatGPT (GPT-5)** | Core backend API design, compliance formulas, debugging |
+| **Cursor Agent** | TypeScript refactoring, alias debugging |
+| **Copilot** | Tailwind and boilerplate JSX generation |
 
-AI Output Highlights
+---
 
-Generated full tsconfig.json with path mappings (@core, @adapters, etc.).
+## 🧱 Example 1 — Project Setup & Database Schema *(Gemini)*
 
-Installed and configured express, prisma, @prisma/client, ts-node-dev, dotenv.
+**Prompt:**  
+> “I’m working on a full-stack assignment using Node.js, TypeScript, and PostgreSQL with Hexagonal Architecture. Please guide me through initializing dependencies, configuring TypeScript, and defining Prisma schema based on the provided table.”
 
-Suggested PostgreSQL installation via brew install postgresql@16.
+**AI Output Highlights**
+- Generated complete `tsconfig.json` with path mappings (`@core`, `@adapters`, etc.).  
+- Installed and configured Express, Prisma, and ts-node-dev.  
+- Suggested PostgreSQL setup: `brew install postgresql@16`.  
+- Created initial `schema.prisma` with Route model fields.
 
-Created initial schema.prisma with Route model fields from the brief.
+**Fixes Made**
+- `psql: command not found` → `brew link postgresql@16`.  
+- Prisma connection error → added `.env` with `DATABASE_URL`.  
+- Permission issue →  
+  ```sql
+  ALTER USER fueleu_admin CREATEDB;
+````
 
-Fixes Made After Testing
+* Validation: `npx prisma migrate dev` successfully created `fueleu_db` and seeded 5 routes.
+  ✅ *Gemini was great for scaffolding, weak for path alias handling.*
 
-psql: command not found → fixed with brew link postgresql@16.
+---
 
-Prisma couldn’t connect → added .env with DATABASE_URL.
+## ⚙️ Example 2 — Express Server Entrypoint *(Gemini → Cursor)*
 
-Migration permission error →
+**Prompt:**
 
-ALTER USER fueleu_admin CREATEDB;
+> “Create the backend entrypoint (server.ts, index.ts) and include a dev script using ts-node-dev.”
 
+**AI Output**
 
-Validation – npx prisma migrate dev created fueleu_db and seeded 5 routes.
-Observation – Gemini was great for boilerplate, weak on alias/path issues.
-
-⚙️ Example 2 — Express Server Entrypoint (Gemini → Cursor)
-
-Prompt:
-
-“Create the backend entrypoint (server.ts, index.ts) and include a dev script using ts-node-dev.”
-
-Output
-
+```ts
 // server.ts
 import express from "express";
 export function createServer() {
@@ -65,7 +73,9 @@ export function createServer() {
   app.get("/health", (_, res) => res.status(200).send({ status: "ok" }));
   return app;
 }
+```
 
+```ts
 // index.ts
 import * as dotenv from "dotenv";
 dotenv.config();
@@ -73,161 +83,178 @@ import { createServer } from "./infrastructure/server/server";
 const port = process.env.PORT || 4000;
 const app = createServer();
 app.listen(port, () => console.log(`[Server] Running at ${port}`));
+```
 
+**Fix by Cursor Agent**
+Added alias loader for dev script:
 
-Correction by Cursor Agent
-Added alias loader:
-
+```json
 "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/index.ts"
+```
 
+✅ *Result:* Server reachable at [http://localhost:4000/health](http://localhost:4000/health)
 
-Result: server reachable at http://localhost:4000/health.
+---
 
-📊 Example 3 — Database Seeding (Gemini → ChatGPT)
+## 📊 Example 3 — Database Seeding *(Gemini → ChatGPT)*
 
-Prompt:
+**Prompt:**
 
-“Seed the five route records from the KPIs dataset using Prisma.”
+> “Seed the five route records from the KPIs dataset using Prisma.”
 
-Output
+**AI Output**
 
+```ts
 await prisma.route.deleteMany();
 await prisma.route.createMany({ data: routesData });
+```
 
+**Fix**
+Gemini missed the seed script entry; ChatGPT corrected it:
 
-Debugging
+```json
+"prisma": { "seed": "ts-node prisma/seed.ts" }
+```
 
-Gemini missed the seed script line; ChatGPT fixed it with
-"prisma": { "seed": "ts-node prisma/seed.ts" }.
+✅ *Validation:* `npx prisma db seed` worked.
+*Gemini handled data creation, GPT-5 fixed execution context.*
 
-Explained running npx prisma db seed.
+---
 
-Validation: Data visible in Prisma Studio.
-Observation: Gemini handled data; ChatGPT fixed execution context.
+## 🧮 Example 4 — Routes API *(GPT-5)*
 
-🧮 Example 4 — Routes API (GPT-5)
+**Prompt:**
 
-Prompt:
+> “Implement /routes and /routes/:routeId/baseline endpoints using Hexagonal Architecture.”
 
-“Implement /routes and /routes/:routeId/baseline endpoints using Hexagonal Architecture.”
+**Files Generated**
 
-Generated Files
-
+```
 core/domain/Route.ts
-
 core/ports/outbound/RouteRepository.ts
-
 adapters/outbound/postgres/PrismaRouteRepository.ts
-
 core/application/usecases/GetRoutes.ts
-
 core/application/usecases/SetBaselineRoute.ts
-
 adapters/inbound/http/RouteController.ts
+```
 
-Key Feature:
-setBaseline() used prisma.$transaction() to unset/set baseline atomically.
+**Key Feature:**
+`setBaseline()` used `prisma.$transaction()` to unset/set baseline atomically.
+✅ *GPT-5 followed clean architecture precisely.*
 
-Validation: /routes returned JSON; aliases fixed manually.
-Observation: GPT-5 followed Clean Architecture flawlessly.
+---
 
-⚖️ Example 5 — Comparison Endpoint
+## ⚖️ Example 5 — Route Comparison Endpoint *(GPT-5)*
 
-Prompt:
+**Prompt:**
 
-“Implement /routes/comparison returning baseline, percentDiff, and compliant flag.”
+> “Implement /routes/comparison returning baseline, percentDiff, and compliant flag.”
 
+```ts
 const percentDiff = ((r.ghgIntensity - baseline.ghgIntensity) / baseline.ghgIntensity) * 100;
 const compliant = r.ghgIntensity <= baseline.ghgIntensity;
+```
 
+**Fix:** renamed `differencePercent` → `percentDiff` to match frontend expectations.
+✅ *Chart rendered correctly after fix.*
 
-Fix: renamed differencePercent → percentDiff to match frontend.
-Result: comparison chart and table rendered correctly.
+---
 
-🌍 Example 6 — Compliance Balance (CB)
+## 🌍 Example 6 — Compliance Balance (CB) *(GPT-5)*
 
-Prompt:
+**Prompt:**
 
-“Build /compliance/cb and /compliance/adjusted-cb using formula
-CB = (Baseline GHG − Route GHG) × Distance.”
+> “Build /compliance/cb and /compliance/adjusted-cb using formula CB = (Baseline GHG − Route GHG) × Distance.”
 
+```ts
 const cbGco2eq = (baseline.ghgIntensity - route.ghgIntensity) * route.distance;
 const adjustedCb = cbGco2eq * 0.95;
+```
 
+✅ *Handled missing baselines gracefully; validated via curl.*
+GPT-5’s reasoning and edge-case handling were spot on.
 
-Handled missing baselines; validated via curl.
-GPT-5 reasoning accurate; negatives handled gracefully.
+---
 
-💰 Example 7 — Banking API (Article 20)
+## 💰 Example 7 — Banking API *(Article 20)*
 
-Prompt:
+**Prompt:**
 
-“Implement /banking/bank and /banking/apply validating surplus/deficit.”
+> “Implement /banking/bank and /banking/apply validating surplus/deficit.”
 
-Highlights:
+**Highlights**
 
-Domain BankEntry.ts, repository, immutable ledger (credits/debits).
+* Domain: `BankEntry.ts`, immutable ledger (credits/debits).
+* Validation for insufficient balance and ledger consistency.
 
-Validations for insufficient balance.
+**Test Flow**
 
-Test Flow
+1. `/compliance/cb?routeId=R002&year=2024`
+2. `POST /banking/bank`
+3. `GET /banking/records` → shows surplus
+4. `POST /banking/apply` → deficit reduced
 
-/compliance/cb?routeId=R002&year=2024
+✅ *Clean use-case separation and validation logic.*
 
-POST /banking/bank
+---
 
-GET /banking/records → shows surplus
+## ⚓ Example 8 — Pooling API *(Article 21)*
 
-POST /banking/apply → deficit reduced
+**Prompt:**
 
-Observation: Clean use-case separation and validation logic.
+> “Implement pooling with Σ(adjustedCB) ≥ 0 and prevent worsening deficits.”
 
-⚓ Example 8 — Pooling API (Article 21)
+**Features**
 
-Prompt:
+* `Pool` & `PoolMember` models
+* Greedy surplus-to-deficit allocation
+* Validation for invalid pools
 
-“Implement pooling with Σ(adjustedCB) ≥ 0 and prevent worsening deficits.”
+✅ *Invalid pools blocked, valid pools accepted — UI showed red/green totals.*
 
-Features:
+---
 
-Pool & PoolMember models.
+## 🧠 Validation & Debugging Summary
 
-Greedy surplus-to-deficit allocation.
+| 🧩 Problem               | 🧠 Agent | 🛠️ Fix                            |
+| ------------------------ | -------- | ---------------------------------- |
+| Prisma unique constraint | GPT-5    | deleteMany before seed             |
+| TS path alias error      | Cursor   | Added `-r tsconfig-paths/register` |
+| PercentDiff not showing  | GPT-5    | Renamed key                        |
+| CB negative handling     | Manual   | Added baseline check               |
+| DB permissions           | Gemini   | `ALTER USER ... CREATEDB`          |
 
-Validation for invalid pools.
+---
 
-Result: Invalid pools blocked; valid pools accepted; UI shows red/green totals.
+## 📈 Observations
 
-🧠 Validation & Debugging Summary
-Problem	Agent	Fix
-Prisma unique constraint	GPT-5	deleteMany before seed
-TS path alias error	Cursor	Added -r tsconfig-paths/register
-PercentDiff not showing	GPT-5	Renamed key
-CB negative handling	Manual	Added baseline check
-DB permissions	Gemini	ALTER USER ... CREATEDB
-📈 Observations
-Area	Value of AI
-Setup	10× faster project bootstrapping
-Prisma schema	Saved manual modeling time
-Business logic	GPT-5 accurately modeled EU formulas
-Debugging	GPT-5 + Cursor fixed TS/alias errors
-Documentation	Generated structured MDs rapidly
-🧩 Best Practices Followed
+| Area           | Impact of AI                                       |
+| -------------- | -------------------------------------------------- |
+| Setup          | ⚡ 10× faster project bootstrapping                 |
+| Prisma schema  | 🧩 Saved hours of manual modeling                  |
+| Business logic | 🧠 GPT-5 modeled EU formulas accurately            |
+| Debugging      | 🧰 GPT-5 + Cursor resolved alias and Prisma errors |
+| Documentation  | 🪶 Generated structured MD logs rapidly            |
 
-Hexagonal architecture (core / adapters / infrastructure)
+---
 
-Prisma transactions for atomicity
+## 🧩 Best Practices Followed
 
-Validation before mutations
+* Clean **Hexagonal Architecture (core/adapters/infrastructure)**
+* **Atomic transactions** via Prisma
+* **Validation-first** design before data mutations
+* **TypeScript strict mode** enabled
+* **Reusable domain logic** for CB / Banking / Pooling
+* **Incremental commits** showcasing AI involvement
 
-TypeScript strict mode
+---
 
-Reusable domain logic for CB/Banking/Pooling
+## 🚀 Summary
 
-Incremental commits showing AI workflow
+AI agents accelerated development dramatically while maintaining architectural discipline.
+**Gemini** handled setup, **GPT-5** managed reasoning and logic, and **Cursor + Copilot** polished and optimized the code.
 
-🚀 Summary
+Manual validation ensured compliance accuracy and production readiness.
+Together, they proved that **AI-assisted engineering can deliver clean, scalable software — faster than ever.**
 
-AI agents dramatically accelerated development while maintaining architectural integrity.
-Gemini handled setup, GPT-5 managed reasoning and refactoring, and Cursor + Copilot filled syntax gaps.
-Manual validation ensured regulatory and logical correctness.
+---
