@@ -1,18 +1,21 @@
 
----
+<p align="center">
+  <img src="https://img.shields.io/badge/FuelEU%20Maritime%20Compliance%20Platform-2025-blue?style=for-the-badge&logo=vercel&logoColor=white" />
+</p>
 
-```markdown
-# 🛳️ FuelEU Maritime Compliance Platform
+<h1 align="center">🛳️ FuelEU Maritime Compliance Platform</h1>
 
-A full-stack implementation of the **FuelEU Maritime Regulation (EU 2023/1805)** compliance platform.  
-It models **Compliance Balances (CB)**, **Banking**, **Pooling**, and **Route Comparison** using a clean **Hexagonal Architecture**.
+<p align="center">
+A full-stack implementation of the <b>FuelEU Maritime Regulation (EU 2023/1805)</b> compliance platform.<br/>
+It models <b>Compliance Balances (CB)</b>, <b>Banking</b>, <b>Pooling</b>, and <b>Route Comparison</b> — built with a clean <b>Hexagonal Architecture</b>.
+</p>
 
 ---
 
 ## ⚙️ Tech Stack
 
-| Layer | Technology |
-|-------|-------------|
+| 💻 Layer | 🧩 Technology |
+|----------|---------------|
 | **Frontend** | React + TypeScript + TailwindCSS |
 | **Backend** | Node.js + Express + TypeScript |
 | **Database** | PostgreSQL + Prisma ORM |
@@ -29,28 +32,28 @@ It models **Compliance Balances (CB)**, **Banking**, **Pooling**, and **Route Co
 backend/
 core/
 domain/             # Entities (Route, BankEntry, Pool, etc.)
-application/         # Use-cases (ComputeCB, BankSurplus, etc.)
-ports/               # Interfaces (repositories)
+application/        # Use-cases (ComputeCB, BankSurplus, etc.)
+ports/              # Interfaces (repositories)
 adapters/
-inbound/http/        # Controllers / Routers
-outbound/postgres/   # Prisma repository adapters
+inbound/http/       # Controllers / Routers
+outbound/postgres/  # Prisma repository adapters
 infrastructure/
-db/                  # Prisma schema & migrations
-server/              # Express server setup
+db/                 # Prisma schema & migrations
+server/             # Express server setup
 
 frontend/
 src/
-core/                # Domain logic & hooks
-adapters/            # API clients / UI
-shared/              # Components & utils
+core/               # Domain logic & hooks
+adapters/           # API clients / UI
+shared/             # Components & utils
 
 ````
 
-### 🧩 Principles Followed
+### 🧩 Principles
 
-- Dependency inversion (core → ports → adapters)  
-- No framework dependencies inside `core/`  
-- All formulas implemented in use-cases, not controllers  
+- Dependency inversion (**core → ports → adapters**)  
+- Framework-free domain logic inside `core/`  
+- Use-cases handle formulas, controllers only orchestrate  
 
 ---
 
@@ -62,16 +65,12 @@ shared/              # Components & utils
 cd backend
 npm install
 cp .env.example .env
-# edit DATABASE_URL if needed
 npx prisma migrate dev --name init
 npx prisma db seed
 npm run dev
 ````
 
-Server runs at 👉 **[http://localhost:3001](http://localhost:4000)**
-
-<img width="854" height="57" alt="image" src="https://github.com/user-attachments/assets/a8498aa1-79d1-4368-a86f-f67d1360e965" />
-
+Server: **[http://localhost:3001](http://localhost:3001)**
 
 ---
 
@@ -83,14 +82,11 @@ npm install
 npm run dev
 ```
 
-Frontend runs at 👉 **[http://localhost:5173](http://localhost:5173)**
+App: **[http://localhost:5173](http://localhost:5173)**
 
-<img width="1470" height="878" alt="image" src="https://github.com/user-attachments/assets/5e729073-4625-4bd7-a98e-49fa861220f3" />
-
-<img width="1465" height="879" alt="image" src="https://github.com/user-attachments/assets/61614b64-855a-4df6-94eb-d38becd5172f" />
-
-<img width="1447" height="456" alt="image" src="https://github.com/user-attachments/assets/d50328c3-6497-4f9b-88d7-acc3e721271f" />
-
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/5e729073-4625-4bd7-a98e-49fa861220f3" width="90%" />
+</p>
 
 ---
 
@@ -113,35 +109,35 @@ VITE_API_BASE_URL="http://localhost:3001"
 
 ## 🔗 API Endpoints
 
-### `/routes`
+### ⚓ `/routes`
 
-| Method | Endpoint                    | Description                    |
-| ------ | --------------------------- | ------------------------------ |
-| `GET`  | `/routes`                   | Fetch all routes               |
-| `POST` | `/routes/:routeId/baseline` | Set a baseline route           |
-| `GET`  | `/routes/comparison`        | Compare all routes vs baseline |
+| Method | Endpoint                    | Description                |
+| ------ | --------------------------- | -------------------------- |
+| GET    | `/routes`                   | Fetch all routes           |
+| POST   | `/routes/:routeId/baseline` | Set a baseline route       |
+| GET    | `/routes/comparison`        | Compare routes vs baseline |
 
-### `/compliance`
+### 🧮 `/compliance`
 
 | Method | Endpoint                               | Description                         |
 | ------ | -------------------------------------- | ----------------------------------- |
-| `GET`  | `/compliance/cb?routeId&year`          | Compute Compliance Balance          |
-| `GET`  | `/compliance/adjusted-cb?routeId&year` | Compute Adjusted Compliance Balance |
+| GET    | `/compliance/cb?routeId&year`          | Compute Compliance Balance          |
+| GET    | `/compliance/adjusted-cb?routeId&year` | Compute Adjusted Compliance Balance |
 
-### `/banking`
+### 💰 `/banking`
 
 | Method | Endpoint                        | Description          |
 | ------ | ------------------------------- | -------------------- |
-| `GET`  | `/banking/records?routeId&year` | Fetch banked entries |
-| `POST` | `/banking/bank`                 | Bank surplus         |
-| `POST` | `/banking/apply`                | Apply banked surplus |
+| GET    | `/banking/records?routeId&year` | Fetch banked entries |
+| POST   | `/banking/bank`                 | Bank surplus         |
+| POST   | `/banking/apply`                | Apply banked surplus |
 
-### `/pools`
+### ⚓ `/pools`
 
-| Method | Endpoint | Description              |
-| ------ | -------- | ------------------------ |
-| `POST` | `/pools` | Create a pool of ships   |
-| `GET`  | `/pools` | Fetch all existing pools |
+| Method | Endpoint | Description            |
+| ------ | -------- | ---------------------- |
+| POST   | `/pools` | Create a pool of ships |
+| GET    | `/pools` | Fetch all pools        |
 
 ---
 
@@ -157,70 +153,55 @@ VITE_API_BASE_URL="http://localhost:3001"
 
 ---
 
-## 📊 Example Requests
+## 🧭 Frontend Tabs Overview
 
-### 🧾 Compute CB
-
-```bash
-curl "http://localhost:3001/compliance/cb?routeId=R002&year=2024"
-```
-
-### 💰 Bank Surplus
-
-```bash
-curl -X POST http://localhost:3001/banking/bank \
-     -H "Content-Type: application/json" \
-     -d '{"routeId":"R002","year":2024}'
-```
-
-### ⚓ Pooling
-
-```bash
-curl -X POST http://localhost:3001/pools \
-     -H "Content-Type: application/json" \
-     -d '{"members":[{"routeId":"R002"},{"routeId":"R004"}],"year":2025}'
-```
-
----
-
-## 🧩 Frontend Tabs Overview
-
-| Tab         | Description                                             |
-| ----------- | ------------------------------------------------------- |
-| **Routes**  | Displays all routes, allows setting baseline            |
-| **Compare** | Compares routes vs baseline (% difference & compliance) |
-| **Banking** | Handles surplus banking and deficit application         |
-| **Pooling** | Enables ship pooling under compliance rules             |
+| 🗂️ Tab     | Description                           |
+| ----------- | ------------------------------------- |
+| **Routes**  | View and manage all routes            |
+| **Compare** | Compare routes vs baseline            |
+| **Banking** | Manage banking and surplus            |
+| **Pooling** | Handle pooling and compliance sharing |
 
 ---
 
 ## 🤖 AI Agent Collaboration
 
-This project was built using **AI-assisted development** — see
-📘 [`AGENT_WORKFLOW.md`](./AGENT_WORKFLOW.md) for detailed prompts, fixes, and validation logs.
+* 🧠 **Gemini** → Setup, schema, and structure
+* ⚙️ **GPT-5** → Reasoning, debugging, architecture
+* 🧩 **Cursor** → Path cleanup & refactors
+* 🎨 **Copilot** → Frontend & UI styling
+
+📘 Read details: [`AGENT_WORKFLOW.md`](./AGENT_WORKFLOW.md)
 
 ---
 
 ## 💬 Reflection
 
-Read my short essay on lessons learned using multiple AI tools:
-📗 [`REFLECTION.md`](./REFLECTION.md)
+Read about how AI agents co-built this project → [`REFLECTION.md`](./REFLECTION.md)
 
 ---
 
 ## 👨‍💻 Author
 
-**Sumit Kumar**
-Full-Stack Developer | AI-Driven Software Engineer
-
-[🌐 LinkedIn Profile](https://www.linkedin.com/in/sumit-kumar2004/)
-📧 [sumit.kumar120664@gmail.com](mailto:sumit.kumar120664@gmail.com)
+<p align="center">
+<b>Sumit Kumar</b><br/>
+Full-Stack Developer | AI-Driven Software Engineer<br/>
+<a href="https://www.linkedin.com/in/sumit-kumar2004/">
+  <img src="https://img.shields.io/badge/LinkedIn%20Profile-blue?style=for-the-badge&logo=linkedin&logoColor=white" />
+</a><br/>
+📧 sumit.kumar120664@gmail.com
+</p>
 
 ---
 
 ## 🏁 Summary
 
-AI agents like **Gemini**, **ChatGPT (GPT-5)**, **Cursor**, and **Copilot** helped design, refactor, and debug this entire project.
-The result is a clean, maintainable, and fully functional FuelEU compliance platform — built fast, but engineered right.
+AI agents like **Gemini**, **GPT-5**, **Cursor**, and **Copilot** helped build, debug, and refine the project — delivering a clean, maintainable, production-ready platform.
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Code%20Quality-Excellent-brightgreen?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Architecture-Hexagonal-blue?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Powered%20By-AI%20Agents-purple?style=for-the-badge" />
+</p>
 
 ---
